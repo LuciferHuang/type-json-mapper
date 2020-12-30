@@ -1,4 +1,5 @@
 import { META_KEY } from "./config";
+import { BASIC_TYPE } from "./types";
 
 /**
  * @param {any} target object
@@ -39,6 +40,14 @@ export function isArray(target: any): boolean {
  */
 export function hasAnyNullOrUndefined(...args: any[]): boolean {
   return args.some((arg: any) => arg === null || arg === undefined);
+}
+
+/**
+ * @param {any} target
+ * @return {Boolean}
+ */
+export function isNotBasicType(target: any): boolean {
+  return BASIC_TYPE.every(type => type !== typeof target);
 }
 
 /**

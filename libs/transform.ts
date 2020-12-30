@@ -1,5 +1,5 @@
-import { BASIC_TYPE, TYPE_NAME } from "./types";
-import { formatDate, isInvalidDate } from "./utils";
+import { TYPE_NAME } from "./types";
+import { formatDate, isNotBasicType } from "./utils";
 
 /**
  * @param {any} oriData - 目标数据
@@ -7,7 +7,7 @@ import { formatDate, isInvalidDate } from "./utils";
  * @return {any}
 */
 export function transType<T>(oriData: any, typeName?: TYPE_NAME): any {
-  if (!BASIC_TYPE.includes(typeof oriData)) {
+  if (isNotBasicType(oriData)) {
     return oriData;
   }
   let value: any = null;

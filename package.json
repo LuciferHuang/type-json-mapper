@@ -1,14 +1,12 @@
 {
   "name": "type-json-mapper",
-  "version": "1.0.0",
-  "description": "Instead of directly using api data, we \\r definitely require an adapter layer to transform data as needed. Furthermore, \\r the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and \\r highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter \\r which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
+  "version": "1.0.2",
+  "description": "Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "babel-core": "^6.26.3",
-    "babel-preset-es2015": "^6.24.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
