@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.deserializeArr = exports.deserialize = exports.deepMapperProperty = exports.mapperProperty = void 0;
+exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.deepMapperProperty = exports.mapperProperty = void 0;
 require("reflect-metadata");
 var transform_1 = require("./libs/transform");
 var utils_1 = require("./libs/utils");
@@ -33,49 +33,119 @@ function deepMapperProperty(value, Clazz) {
 }
 exports.deepMapperProperty = deepMapperProperty;
 /**
+ * 序列化
+*/
+function serialize(Clazz, json, ignore) {
+    if (ignore === void 0) { ignore = true; }
+    if (utils_1.hasAnyNullOrUndefined(Clazz, json)) {
+        throw new Error('(type-json-mapper)serialize：missing Clazz or json');
+    }
+    if (!utils_1.isObject(json)) {
+        throw new Error('(type-json-mapper)serialize：json is not a object');
+    }
+    var result = {};
+    var instance = new Clazz();
+    var keys = Object.keys(instance);
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
+        var value = json[key];
+        // ignore
+        if (ignore && typeof value === 'undefined') {
+            continue;
+        }
+        var localKey = key;
+        var metaObj = utils_1.getJsonProperty(instance, key);
+        if (!metaObj) {
+            continue;
+        }
+        var typeName = metaObj.typeName, interfaceKey = metaObj.localKey;
+        if (interfaceKey !== undefined) {
+            localKey = interfaceKey;
+        }
+        if (typeof value !== 'undefined') {
+            value = transform_1.transType(value, typeName);
+        }
+        if (utils_1.isObject(value)) {
+            var childClazz = metaObj.Clazz;
+            value = serialize(childClazz, value);
+        }
+        if (utils_1.isArray(value)) {
+            var childClazz = metaObj.Clazz;
+            value = serializeArr(childClazz, value);
+        }
+        result[localKey] = value;
+    }
+    return result;
+}
+exports.serialize = serialize;
+/**
+ * 数组序列化
+*/
+function serializeArr(Clazz, list, ignore) {
+    if (ignore === void 0) { ignore = true; }
+    if (utils_1.hasAnyNullOrUndefined(Clazz, list)) {
+        throw new Error('(type-json-mapper)serializeArr：missing Clazz or list');
+    }
+    if (!utils_1.isArray(list)) {
+        throw new Error('(type-json-mapper)serializeArr：list is not a array');
+    }
+    return list.map(function (ele) { return serialize(Clazz, ele, ignore); });
+}
+exports.serializeArr = serializeArr;
+/**
  * 反序列化
 */
-function deserialize(Clazz, json) {
+function deserialize(Clazz, json, ignore) {
+    if (ignore === void 0) { ignore = true; }
     if (utils_1.hasAnyNullOrUndefined(Clazz, json)) {
         throw new Error('(type-json-mapper)deserialize：missing Clazz or json');
     }
     if (!utils_1.isObject(json)) {
         throw new Error('(type-json-mapper)deserialize：json is not a object');
     }
+    var result = {};
     var instance = new Clazz();
-    Object.keys(instance).forEach(function (key) {
-        var value = json[key];
+    var keys = Object.keys(instance);
+    result = instance;
+    for (var _i = 0, keys_2 = keys; _i < keys_2.length; _i++) {
+        var key = keys_2[_i];
         var metaObj = utils_1.getJsonProperty(instance, key);
-        if (metaObj) {
-            var typeName = metaObj.typeName, localKey = metaObj.localKey;
-            var jsonVal = json[localKey];
-            if (typeof jsonVal !== 'undefined') {
-                value = transform_1.transType(jsonVal, typeName);
-            }
-            if (utils_1.isObject(value)) {
-                var childClazz = metaObj.Clazz;
-                value = deserialize(childClazz, value);
-            }
-            if (utils_1.isArray(value)) {
-                var childClazz = metaObj.Clazz;
-                value = deserializeArr(childClazz, value);
-            }
+        if (!metaObj) {
+            continue;
         }
-        instance[key] = value;
-    });
-    return instance;
+        var typeName = metaObj.typeName, localKey = metaObj.localKey;
+        var value = json[localKey];
+        // ignore
+        if (ignore && typeof value === 'undefined') {
+            continue;
+        }
+        if (typeof value !== 'undefined') {
+            value = transform_1.transType(value, typeName);
+        }
+        if (utils_1.isObject(value)) {
+            var childClazz = metaObj.Clazz;
+            value = deserialize(childClazz, value);
+        }
+        if (utils_1.isArray(value)) {
+            var childClazz = metaObj.Clazz;
+            value = deserializeArr(childClazz, value);
+        }
+        result[key] = value;
+    }
+    return result;
 }
 exports.deserialize = deserialize;
 /**
  * 数组反序列化
 */
-function deserializeArr(Clazz, list) {
+function deserializeArr(Clazz, list, ignore) {
+    if (ignore === void 0) { ignore = true; }
     if (utils_1.hasAnyNullOrUndefined(Clazz, list)) {
         throw new Error('(type-json-mapper)deserializeArr：missing Clazz or list');
     }
     if (!utils_1.isArray(list)) {
         throw new Error('(type-json-mapper)deserializeArr：list is not a array');
     }
-    return list.map(function (ele) { return deserialize(Clazz, ele); });
+    return list.map(function (ele) { return deserialize(Clazz, ele, ignore); });
 }
 exports.deserializeArr = deserializeArr;

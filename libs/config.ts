@@ -18,4 +18,3 @@ export interface MetadataDeepObject {
   localKey: string;
   Clazz: any;
 }
-

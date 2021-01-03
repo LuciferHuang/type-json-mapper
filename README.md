@@ -96,7 +96,7 @@ let json = {
 };
 ```
 
-Simply, just map it use following code. The mapping is based on <@JsonProperty> decorator meta data.
+Simply, just map it use following code. 
 
 ```typescript
 import { deserialize } from 'type-json-mapper';
@@ -105,3 +105,6 @@ const student = deserialize(Student, json);
 
 ```
 ![result.png](https://i.loli.net/2020/12/30/R59swPZex4NaImQ.png)
+
+## ChangeLog
+1. add serialize 2021/01/13 [HLianfa](https://github.com/Hlianfa)
