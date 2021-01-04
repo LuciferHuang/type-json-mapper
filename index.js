@@ -59,19 +59,20 @@ function serialize(Clazz, json, ignore) {
             continue;
         }
         var typeName = metaObj.typeName, interfaceKey = metaObj.localKey;
-        if (interfaceKey !== undefined) {
+        if (typeof interfaceKey !== 'undefined') {
             localKey = interfaceKey;
         }
         if (typeof value !== 'undefined') {
             value = transform_1.transType(value, typeName);
         }
-        if (utils_1.isObject(value)) {
-            var childClazz = metaObj.Clazz;
-            value = serialize(childClazz, value);
-        }
-        if (utils_1.isArray(value)) {
-            var childClazz = metaObj.Clazz;
-            value = serializeArr(childClazz, value);
+        var childClazz = metaObj.Clazz;
+        if (typeof childClazz !== 'undefined') {
+            if (utils_1.isObject(value)) {
+                value = serialize(childClazz, value);
+            }
+            if (utils_1.isArray(value)) {
+                value = serializeArr(childClazz, value);
+            }
         }
         result[localKey] = value;
     }
@@ -122,13 +123,14 @@ function deserialize(Clazz, json, ignore) {
         if (typeof value !== 'undefined') {
             value = transform_1.transType(value, typeName);
         }
-        if (utils_1.isObject(value)) {
-            var childClazz = metaObj.Clazz;
-            value = deserialize(childClazz, value);
-        }
-        if (utils_1.isArray(value)) {
-            var childClazz = metaObj.Clazz;
-            value = deserializeArr(childClazz, value);
+        var childClazz = metaObj.Clazz;
+        if (typeof childClazz !== 'undefined') {
+            if (utils_1.isObject(value)) {
+                value = deserialize(childClazz, value);
+            }
+            if (utils_1.isArray(value)) {
+                value = deserializeArr(childClazz, value);
+            }
         }
         result[key] = value;
     }

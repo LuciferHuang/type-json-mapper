@@ -61,21 +61,24 @@ export function serialize<T extends GenericObject>(Clazz: { new(): T }, json: Ge
       continue
     }
     const {typeName, localKey: interfaceKey} = metaObj;
-    if (interfaceKey !== undefined) {
+    if (typeof interfaceKey !== 'undefined') {
       localKey = interfaceKey;
     }
     if (typeof value !== 'undefined') {
       value = transType(value, typeName);
     }
 
-    if (isObject(value)) {
-      const {Clazz: childClazz} = metaObj;
-      value = serialize(childClazz, value);
+    const {Clazz: childClazz} = metaObj;
+    if (typeof childClazz !== 'undefined') { 
+      if (isObject(value)) {
+        value = serialize(childClazz, value);
+      }
+      
+      if (isArray(value)) {
+        value = serializeArr(childClazz, value);
+      }
     }
-    if (isArray(value)) {
-      const {Clazz: childClazz} = metaObj;
-      value = serializeArr(childClazz, value);
-    }
+  
     result[localKey] = value;
   }
   return result as T;
@@ -134,15 +137,17 @@ export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: 
       value = transType(value, typeName);
     }
 
-    if (isObject(value)) {
-      const {Clazz: childClazz} = metaObj;
-      value = deserialize(childClazz, value);
+    const {Clazz: childClazz} = metaObj;
+    if (typeof childClazz !== 'undefined') { 
+      if (isObject(value)) {
+        value = deserialize(childClazz, value);
+      }
+
+      if (isArray(value)) {
+        value = deserializeArr(childClazz, value);
+      }
     }
 
-    if (isArray(value)) {
-      const {Clazz: childClazz} = metaObj;
-      value = deserializeArr(childClazz, value);
-    }
     result[key] = value;
   }
   return result as T;
