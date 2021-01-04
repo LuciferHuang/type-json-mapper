@@ -4,6 +4,9 @@
 
 Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter.
 
+### Doc
+[中文文档](https://melonfield.club/column/detail/cvfCiXD8OBn)
+
 ### Get Started
 
 ```bash
@@ -19,7 +22,7 @@ npm install type-json-mapper --save
 Here is a complex example, hopefully could give you an idea of how to use it:
 
 ```typescript
-import { mapperProperty } from "type-json-mapper";
+import { mapperProperty,deepMapperProperty } from "type-json-mapper";
 
 class Lesson {
   @mapperProperty("ClassName")
@@ -100,11 +103,15 @@ Simply, just map it use following code.
 
 ```typescript
 import { deserialize } from 'type-json-mapper';
-
-const student = deserialize(Student, json);
+try {
+  const student = deserialize(Student, json);
+} catch(err) {
+  console.error(err);
+}
 
 ```
 ![result.png](https://i.loli.net/2020/12/30/R59swPZex4NaImQ.png)
 
 ## ChangeLog
-1. add serialize 2021/01/13 [HLianfa](https://github.com/Hlianfa)
+1. add serialize 2021/01/03 [HLianfa](https://github.com/Hlianfa)
+2. add doc 2021/01/04 [HLianfa](https://github.com/Hlianfa)
