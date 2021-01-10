@@ -1,8 +1,8 @@
 {
   "name": "type-json-mapper",
-  "version": "1.0.6",
+  "version": "1.0.9",
   "description": "Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +10,7 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
+    "@types/node": "^14.14.20",
     "typescript": "^3.9.2"
   },
   "repository": {

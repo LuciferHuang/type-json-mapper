@@ -11,7 +11,7 @@ export interface GenericObject {
 
 export interface MetadataObject {
   localKey: string;
-  typeName: TYPE_NAME;
+  typeName: TYPE_NAME | undefined;
 }
 
 export interface MetadataDeepObject {
