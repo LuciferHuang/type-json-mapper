@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import { transType } from './libs/transform';
+import { transType } from './src/transform';
 import { GenericObject, MetadataObject, MetadataDeepObject } from './libs/config';
 import { TYPE_NAME } from './libs/types';
-import { getJsonProperty, hasAnyNullOrUndefined, isArray, isObject, setProperty } from './libs/utils';
+import { getJsonProperty, hasAnyNullOrUndefined, isArray, isObject, setProperty } from './src/utils';
 
 /**
  * 属性装饰器

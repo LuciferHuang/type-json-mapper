@@ -1,6 +1,6 @@
 {
   "name": "type-json-mapper",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "api-mapper",
     "api-adapter"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Hlianfa/type-json-mapper/issues"
   },

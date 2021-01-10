@@ -1,4 +1,4 @@
-import { TYPE_NAME } from "./types";
+import { TYPE_NAME } from "../libs/types";
 import { formatDate, isNotBasicType } from "./utils";
 
 /**

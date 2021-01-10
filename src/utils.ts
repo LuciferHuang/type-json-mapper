@@ -1,5 +1,5 @@
-import { META_KEY } from "./config";
-import { BASIC_TYPE } from "./types";
+import { META_KEY } from "../libs/config";
+import { BASIC_TYPE } from "../libs/types";
 
 /**
  * @param {any} target object
