@@ -4,7 +4,8 @@
   "description": "Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "git checkout npm-release && tsc && git add dist && git commit -m 'publish' && git subtree push --prefix dist origin npm-release && mv package.json ./dist",
+    "publish": "npm run build && npm publish"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
