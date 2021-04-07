@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { transType } from './src/transform';
-import { GenericObject, MetadataObject, MetadataDeepObject } from './libs/config';
+import { GenericObject, MetadataObject, MetadataDeepObject, MetadataFilterObject } from './libs/config';
 import { TYPE_NAME } from './libs/types';
 import { getJsonProperty, hasAnyNullOrUndefined, isArray, isObject, setProperty } from './src/utils';
 
@@ -27,6 +27,20 @@ export function deepMapperProperty(value: string, Clazz: any): (target: Object, 
   const metadata: MetadataDeepObject = {
     localKey: value,
     Clazz
+  };
+  return setProperty(metadata);
+}
+
+/**
+ * 自定义属性装饰器
+ * @param {string} value - 键名
+ * @param {Function} filter
+ * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
+*/
+export function filterMapperProperty(value: string, filter: Function): (target: Object, targetKey: string | symbol)=> void  {
+  const metadata: MetadataFilterObject = {
+    localKey: value,
+    filter
   };
   return setProperty(metadata);
 }
@@ -60,12 +74,22 @@ export function serialize<T extends GenericObject>(Clazz: { new(): T }, json: Ge
     if (!metaObj) {
       continue
     }
+
     const {typeName, localKey: interfaceKey} = metaObj;
     if (typeof interfaceKey !== 'undefined') {
       localKey = interfaceKey;
     }
+
     if (typeof value !== 'undefined') {
       value = transType(value, typeName);
+    }
+
+    const { filter } = metaObj;
+    if (typeof filter === 'function') {
+      const tempVal = filter(value);
+      if (typeof tempVal !== 'undefined') {
+        value = tempVal;
+      }
     }
 
     const {Clazz: childClazz} = metaObj;
@@ -137,8 +161,16 @@ export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: 
       value = transType(value, typeName);
     }
 
-    const {Clazz: childClazz} = metaObj;
-    if (typeof childClazz !== 'undefined') { 
+    const { filter } = metaObj;
+    if (typeof filter === 'function') {
+      const tempVal = filter(value);
+      if (typeof tempVal !== 'undefined') {
+        value = tempVal;
+      }
+    }
+
+    const { Clazz: childClazz } = metaObj;
+    if (typeof childClazz !== 'undefined') {
       if (isObject(value)) {
         value = deserialize(childClazz, value);
       }

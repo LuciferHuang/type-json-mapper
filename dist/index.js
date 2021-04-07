@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.deepMapperProperty = exports.mapperProperty = void 0;
+exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.manuelMapperProperty = exports.deepMapperProperty = exports.mapperProperty = void 0;
 require("reflect-metadata");
 var transform_1 = require("./src/transform");
 var utils_1 = require("./src/utils");
@@ -32,6 +32,20 @@ function deepMapperProperty(value, Clazz) {
     return utils_1.setProperty(metadata);
 }
 exports.deepMapperProperty = deepMapperProperty;
+/**
+ * 自定义属性装饰器
+ * @param {string} value - 键名
+ * @param {Function} filter
+ * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
+*/
+function manuelMapperProperty(value, filter) {
+    var metadata = {
+        localKey: value,
+        filter: filter
+    };
+    return utils_1.setProperty(metadata);
+}
+exports.manuelMapperProperty = manuelMapperProperty;
 /**
  * 序列化
 */

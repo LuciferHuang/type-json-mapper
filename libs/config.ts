@@ -18,3 +18,7 @@ export interface MetadataDeepObject {
   localKey: string;
   Clazz: any;
 }
+export interface MetadataFilterObject {
+  localKey: string;
+  filter: Function;
+}

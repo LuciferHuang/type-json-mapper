@@ -5,14 +5,18 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc && git checkout npm-release && git add . && git commit -m 'publish' && git subtree push --prefix dist origin npm-release && mv package.json ./dist",
-    "publish": "npm run build && npm publish"
+    "publish": "npm run build && npm publish",
+    "test": "jest --collectCoverage"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.22",
     "@types/node": "^14.14.20",
-    "typescript": "^3.9.2"
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.4",
+    "typescript": "^3.9.9"
   },
   "repository": {
     "type": "git",
