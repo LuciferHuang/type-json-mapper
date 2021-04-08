@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.filterMapperProperty = exports.deepMapperProperty = exports.mapperProperty = void 0;
+exports.deserializeArr = exports.deserialize = exports.filterMapperProperty = exports.deepMapperProperty = exports.mapperProperty = void 0;
 require("reflect-metadata");
 var transform_1 = require("./src/transform");
 var utils_1 = require("./src/utils");
@@ -47,78 +47,9 @@ function filterMapperProperty(value, filter) {
 }
 exports.filterMapperProperty = filterMapperProperty;
 /**
- * 序列化
-*/
-function serialize(Clazz, json, ignore) {
-    if (ignore === void 0) { ignore = true; }
-    if (utils_1.hasAnyNullOrUndefined(Clazz, json)) {
-        throw new Error('(type-json-mapper)serialize：missing Clazz or json');
-    }
-    if (!utils_1.isObject(json)) {
-        throw new Error('(type-json-mapper)serialize：json is not a object');
-    }
-    var result = {};
-    var instance = new Clazz();
-    var keys = Object.keys(instance);
-    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
-        var key = keys_1[_i];
-        var value = json[key];
-        // ignore
-        if (ignore && typeof value === 'undefined') {
-            continue;
-        }
-        var localKey = key;
-        var metaObj = utils_1.getJsonProperty(instance, key);
-        if (!metaObj) {
-            continue;
-        }
-        var typeName = metaObj.typeName, interfaceKey = metaObj.localKey;
-        if (typeof interfaceKey !== 'undefined') {
-            localKey = interfaceKey;
-        }
-        if (typeof value !== 'undefined') {
-            value = transform_1.transType(value, typeName);
-        }
-        var filter = metaObj.filter;
-        if (typeof filter === 'function') {
-            var tempVal = filter(value);
-            if (typeof tempVal !== 'undefined') {
-                value = tempVal;
-            }
-        }
-        var childClazz = metaObj.Clazz;
-        if (typeof childClazz !== 'undefined') {
-            if (utils_1.isObject(value)) {
-                value = serialize(childClazz, value);
-            }
-            if (utils_1.isArray(value)) {
-                value = serializeArr(childClazz, value);
-            }
-        }
-        result[localKey] = value;
-    }
-    return result;
-}
-exports.serialize = serialize;
-/**
- * 数组序列化
-*/
-function serializeArr(Clazz, list, ignore) {
-    if (ignore === void 0) { ignore = true; }
-    if (utils_1.hasAnyNullOrUndefined(Clazz, list)) {
-        throw new Error('(type-json-mapper)serializeArr：missing Clazz or list');
-    }
-    if (!utils_1.isArray(list)) {
-        throw new Error('(type-json-mapper)serializeArr：list is not a array');
-    }
-    return list.map(function (ele) { return serialize(Clazz, ele, ignore); });
-}
-exports.serializeArr = serializeArr;
-/**
  * 反序列化
 */
-function deserialize(Clazz, json, ignore) {
-    if (ignore === void 0) { ignore = true; }
+function deserialize(Clazz, json) {
     if (utils_1.hasAnyNullOrUndefined(Clazz, json)) {
         throw new Error('(type-json-mapper)deserialize：missing Clazz or json');
     }
@@ -129,20 +60,20 @@ function deserialize(Clazz, json, ignore) {
     var instance = new Clazz();
     var keys = Object.keys(instance);
     result = instance;
-    for (var _i = 0, keys_2 = keys; _i < keys_2.length; _i++) {
-        var key = keys_2[_i];
-        var metaObj = utils_1.getJsonProperty(instance, key);
-        if (!metaObj) {
-            continue;
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
+        var value = json[key];
+        var metaObj = {};
+        metaObj = utils_1.getJsonProperty(instance, key);
+        if (typeof metaObj === 'undefined') {
+            metaObj = {};
         }
         var typeName = metaObj.typeName, localKey = metaObj.localKey;
-        var value = json[localKey];
-        // ignore
-        if (ignore && typeof value === 'undefined') {
-            continue;
-        }
-        if (typeof value !== 'undefined') {
-            value = transform_1.transType(value, typeName);
+        if (!['', 0, undefined].includes(localKey)) {
+            value = json[localKey];
+            if (typeof value !== 'undefined') {
+                value = transform_1.transType(value, typeName);
+            }
         }
         var filter = metaObj.filter;
         if (typeof filter === 'function') {
@@ -168,14 +99,10 @@ exports.deserialize = deserialize;
 /**
  * 数组反序列化
 */
-function deserializeArr(Clazz, list, ignore) {
-    if (ignore === void 0) { ignore = true; }
+function deserializeArr(Clazz, list) {
     if (utils_1.hasAnyNullOrUndefined(Clazz, list)) {
         throw new Error('(type-json-mapper)deserializeArr：missing Clazz or list');
     }
-    if (!utils_1.isArray(list)) {
-        throw new Error('(type-json-mapper)deserializeArr：list is not a array');
-    }
-    return list.map(function (ele) { return deserialize(Clazz, ele, ignore); });
+    return list.map(function (ele) { return deserialize(Clazz, ele); });
 }
 exports.deserializeArr = deserializeArr;

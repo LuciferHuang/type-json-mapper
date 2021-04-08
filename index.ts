@@ -46,88 +46,9 @@ export function filterMapperProperty(value: string, filter: Function): (target: 
 }
 
 /**
- * 序列化
-*/
-export function serialize<T extends GenericObject>(Clazz: { new(): T }, json: GenericObject, ignore: boolean = true) {
-  if (hasAnyNullOrUndefined(Clazz, json)) {
-    throw new Error('(type-json-mapper)serialize：missing Clazz or json');
-  }
-  
-  if (!isObject(json)) {
-    throw new Error('(type-json-mapper)serialize：json is not a object');
-  }
-
-  const result = {};
-
-  let instance: GenericObject = new Clazz();
-
-  const keys = Object.keys(instance);
-
-  for (const key of keys) {
-    let value = json[key];
-    // ignore
-    if (ignore && typeof value === 'undefined') {
-      continue;
-    }
-    let localKey = key;
-    const metaObj = getJsonProperty(instance, key);
-    if (!metaObj) {
-      continue
-    }
-
-    const {typeName, localKey: interfaceKey} = metaObj;
-    if (typeof interfaceKey !== 'undefined') {
-      localKey = interfaceKey;
-    }
-
-    if (typeof value !== 'undefined') {
-      value = transType(value, typeName);
-    }
-
-    const { filter } = metaObj;
-    if (typeof filter === 'function') {
-      const tempVal = filter(value);
-      if (typeof tempVal !== 'undefined') {
-        value = tempVal;
-      }
-    }
-
-    const {Clazz: childClazz} = metaObj;
-    if (typeof childClazz !== 'undefined') { 
-      if (isObject(value)) {
-        value = serialize(childClazz, value);
-      }
-      
-      if (isArray(value)) {
-        value = serializeArr(childClazz, value);
-      }
-    }
-  
-    result[localKey] = value;
-  }
-  return result as T;
-}
-
-/**
- * 数组序列化
-*/
-export function serializeArr(Clazz: { new(): GenericObject }, list: GenericObject[], ignore: boolean = true) {
-
-  if (hasAnyNullOrUndefined(Clazz, list)) {
-    throw new Error('(type-json-mapper)serializeArr：missing Clazz or list');
-  }
-  
-  if (!isArray(list)) {
-    throw new Error('(type-json-mapper)serializeArr：list is not a array');
-  }
-
-  return list.map((ele: GenericObject) => serialize(Clazz, ele, ignore));
-}
-
-/**
  * 反序列化
 */
-export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: GenericObject, ignore: boolean = true) {
+export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: GenericObject) {
 
   if (hasAnyNullOrUndefined(Clazz, json)) {
     throw new Error('(type-json-mapper)deserialize：missing Clazz or json');
@@ -146,19 +67,20 @@ export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: 
   result = instance;
 
   for (const key of keys) {
-    const metaObj = getJsonProperty(instance, key);
-    if (!metaObj) {
-      continue;
-    }
-    const {typeName, localKey} = metaObj;
-    let value = json[localKey];
-    // ignore
-    if (ignore && typeof value === 'undefined') {
-      continue;
+    let value = json[key];
+    let metaObj: GenericObject = {};
+
+    metaObj = getJsonProperty(instance, key);
+    if (typeof metaObj === 'undefined') {
+      metaObj = {};
     }
 
-    if (typeof value !== 'undefined') {
-      value = transType(value, typeName);
+    const { typeName, localKey } = metaObj;
+    if (!['', 0, undefined].includes(localKey)) {
+      value = json[localKey];
+      if (typeof value !== 'undefined') {
+        value = transType(value, typeName);
+      }
     }
 
     const { filter } = metaObj;
@@ -188,15 +110,11 @@ export function deserialize<T extends GenericObject>(Clazz: { new(): T }, json: 
 /**
  * 数组反序列化
 */
-export function deserializeArr(Clazz: { new(): GenericObject }, list: GenericObject[], ignore: boolean = true) {
+export function deserializeArr(Clazz: { new(): GenericObject }, list: GenericObject[]) {
 
   if (hasAnyNullOrUndefined(Clazz, list)) {
     throw new Error('(type-json-mapper)deserializeArr：missing Clazz or list');
   }
-  
-  if (!isArray(list)) {
-    throw new Error('(type-json-mapper)deserializeArr：list is not a array');
-  }
 
-  return list.map((ele: GenericObject) => deserialize(Clazz, ele, ignore));
+  return list.map((ele: GenericObject) => deserialize(Clazz, ele));
 }

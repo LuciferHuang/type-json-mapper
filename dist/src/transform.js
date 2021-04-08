@@ -24,11 +24,11 @@ function transType(oriData, typeName) {
                     throw new Error('int类型转换失败');
                 }
                 break;
-            case 'flot':
+            case 'float':
                 value = parseFloat(oriData);
                 if (value !== value) {
                     // NaN
-                    throw new Error('flot类型转换失败');
+                    throw new Error('float类型转换失败');
                 }
                 break;
             case 'boolean':
@@ -50,7 +50,6 @@ function transType(oriData, typeName) {
     }
     catch (error) {
         value = oriData;
-        console.error(oriData + "\u7C7B\u578B\u8F6C\u6362\u5931\u8D25\uFF1A" + error);
     }
     return value;
 }

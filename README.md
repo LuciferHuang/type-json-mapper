@@ -22,7 +22,7 @@ npm install type-json-mapper --save
 Here is a complex example, hopefully could give you an idea of how to use it:
 
 ```typescript
-import { mapperProperty,deepMapperProperty } from "type-json-mapper";
+import { mapperProperty, deepMapperProperty, filterMapperProperty } from "type-json-mapper";
 
 class Lesson {
   @mapperProperty("ClassName")
@@ -38,6 +38,7 @@ class Lesson {
     this.datetime = "";
   }
 }
+
 class Address {
   public province: string;
   public city: string;
@@ -58,8 +59,11 @@ class Student {
   public name: string;
   @mapperProperty("StudentAge", "int")
   public age: number;
-  @mapperProperty("StudentSex", "int")
-  public sex: number;
+  @filterMapperProperty("StudentSex", (val) => {
+    const map = { 1: '男生', 2: '女生'};
+    return map[val];
+  })
+  public sex: string;
   @deepMapperProperty("Address", Address)
   public address?: Address;
   @deepMapperProperty("Lessons", Lesson)
@@ -105,12 +109,13 @@ Simply, just map it use following code.
 import { deserialize } from 'type-json-mapper';
 try {
   const student = deserialize(Student, json);
+  console.dir(student);
 } catch(err) {
   console.error(err);
 }
 
 ```
-![result.png](https://i.loli.net/2020/12/30/R59swPZex4NaImQ.png)
+![result.png](https://i.loli.net/2021/04/09/kPJW6Nn5gduBZXq.png)
 
 ## License
 [MIT](./LICENSE)
@@ -120,3 +125,4 @@ try {
 3. fix deep serialize & deep deserialize --2021/01/05 [HLianfa](https://github.com/Hlianfa)
 4. eliminate redundancy --2021/01/10 [HLianfa](https://github.com/Hlianfa)
 5. change entry file --2021/01/10 [HLianfa](https://github.com/Hlianfa)
+6. add custom filter --2021/04/09 [HLianfa](https://github.com/Hlianfa)

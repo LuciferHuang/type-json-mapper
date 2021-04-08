@@ -23,11 +23,11 @@ export function transType<T>(oriData: any, typeName?: TYPE_NAME): any {
           throw new Error('int类型转换失败');
         }
         break;
-      case 'flot':
+      case 'float':
         value = parseFloat(oriData);
         if (value !== value) {
           // NaN
-          throw new Error('flot类型转换失败');
+          throw new Error('float类型转换失败');
         }
         break;
       case 'boolean':
@@ -48,7 +48,6 @@ export function transType<T>(oriData: any, typeName?: TYPE_NAME): any {
     }
   } catch (error) {
     value = oriData;
-    console.error(`${oriData}类型转换失败：${error}`);
   }
   return value as T;
 }
