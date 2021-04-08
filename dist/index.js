@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.manuelMapperProperty = exports.deepMapperProperty = exports.mapperProperty = void 0;
+exports.deserializeArr = exports.deserialize = exports.serializeArr = exports.serialize = exports.filterMapperProperty = exports.deepMapperProperty = exports.mapperProperty = void 0;
 require("reflect-metadata");
 var transform_1 = require("./src/transform");
 var utils_1 = require("./src/utils");
@@ -38,14 +38,14 @@ exports.deepMapperProperty = deepMapperProperty;
  * @param {Function} filter
  * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
 */
-function manuelMapperProperty(value, filter) {
+function filterMapperProperty(value, filter) {
     var metadata = {
         localKey: value,
         filter: filter
     };
     return utils_1.setProperty(metadata);
 }
-exports.manuelMapperProperty = manuelMapperProperty;
+exports.filterMapperProperty = filterMapperProperty;
 /**
  * 序列化
 */
@@ -78,6 +78,13 @@ function serialize(Clazz, json, ignore) {
         }
         if (typeof value !== 'undefined') {
             value = transform_1.transType(value, typeName);
+        }
+        var filter = metaObj.filter;
+        if (typeof filter === 'function') {
+            var tempVal = filter(value);
+            if (typeof tempVal !== 'undefined') {
+                value = tempVal;
+            }
         }
         var childClazz = metaObj.Clazz;
         if (typeof childClazz !== 'undefined') {
@@ -136,6 +143,13 @@ function deserialize(Clazz, json, ignore) {
         }
         if (typeof value !== 'undefined') {
             value = transform_1.transType(value, typeName);
+        }
+        var filter = metaObj.filter;
+        if (typeof filter === 'function') {
+            var tempVal = filter(value);
+            if (typeof tempVal !== 'undefined') {
+                value = tempVal;
+            }
         }
         var childClazz = metaObj.Clazz;
         if (typeof childClazz !== 'undefined') {
