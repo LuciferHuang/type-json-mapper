@@ -1,88 +1,85 @@
-import { META_KEY } from "../libs/config";
-import { BASIC_TYPE } from "../libs/types";
+import 'reflect-metadata';
 
 /**
- * @param {any} target object
- * @param {string} propertyKey
- * @return {any}
+ * Reflect key
  */
-export function getJsonProperty(target: any, propertyKey: string): any {
-  return Reflect.getMetadata(META_KEY, target, propertyKey);
-}
+export const META_KEY = 'TransKey';
 
 /**
- * @param {any} value
+ * 获取对象meta值
+ * @param target
+ * @param {string} propertyKey
+ * @return
+ */
+export const getJsonProperty = (target, propertyKey: string) =>
+  typeof Reflect.getMetadata === 'function' ? Reflect.getMetadata(META_KEY, target, propertyKey) : undefined;
+
+/**
+ * 设置对象meta值
+ * @param value
  * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
  */
-export function setProperty(value: any): (target: Object, targetKey: string | symbol)=> void {
-  return Reflect.metadata(META_KEY, value);
-}
+export const setProperty = (value: any): ((target: Object, targetKey: string | symbol) => void) =>
+  typeof Reflect.metadata === 'function' && Reflect.metadata(META_KEY, value);
 
 /**
- * @param {any} target object
+ * 判断目标变量是否是对象
+ * @param target
  * @return {Boolean}
  */
-export function isObject(target: any): boolean {
-  return Object.prototype.toString.call(target) === '[object Object]';
-}
+export const isObject = (target): boolean => Object.prototype.toString.call(target) === '[object Object]';
 
 /**
- * @param {any} target
+ * 判断目标变量是否是数组
+ * @param target
  * @return {Boolean}
  */
-export function isArray(target: any): boolean {
-  return Object.prototype.toString.call(target) === '[object Array]';
-}
+export const isArray = (target: any): boolean => Object.prototype.toString.call(target) === '[object Array]';
 
 /**
  * @param {...args:any[]} any arguments
  * @return {Boolean}
  */
-export function hasAnyNullOrUndefined(...args: any[]): boolean {
-  return args.some((arg: any) => arg === null || arg === undefined);
-}
+export const hasAnyNullOrUndefined = (...args: any[]): boolean => args.some((arg: any) => arg === null || arg === undefined);
 
 /**
- * @param {any} target
+ * @param target
  * @return {Boolean}
  */
-export function isNotBasicType(target: any): boolean {
-  return BASIC_TYPE.every(type => type !== typeof target);
-}
+export const isNotBasicType = (target): boolean => ['string', 'number', 'boolean'].every((type) => type !== typeof target);
 
 /**
- * @param {any} timestamp
- * @param {string} format
- * @return {string} 
+ * 判断是否为Date对象
+ * @param date
+ * @return {boolean}
  */
-export function formatDate(timestamp: any, format: string = 'Y-M-D h:m:s'): string {
-  let date = new Date(timestamp);
+export const isInvalidDate = (date: any): boolean => date instanceof Date && isNaN(date.getTime());
+
+/**
+ * 格式化日期时间
+ * @param timestamp
+ * @param {string} format
+ * @return {string}
+ */
+export function formatDate(timestamp: string | number | Date, format = 'Y-M-D h:m:s') {
+  const date = new Date(timestamp);
   if (isInvalidDate(date)) {
     return timestamp;
   }
-  let dateInfo = {
+  const dateInfo = {
     Y: `${date.getFullYear()}`,
     M: `${date.getMonth() + 1}`,
     D: `${date.getDate()}`,
     h: date.getHours(),
     m: date.getMinutes(),
-    s: date.getSeconds(),
-  }
-  let formatNumber = (n: number) => n >= 10 ? `${n}` : `0${n}`;
-  let res = format
+    s: date.getSeconds()
+  };
+  const formatNumber = (n: number) => (n >= 10 ? `${n}` : `0${n}`);
+  return format
     .replace('Y', dateInfo.Y)
     .replace('M', dateInfo.M)
     .replace('D', dateInfo.D)
     .replace('h', formatNumber(dateInfo.h))
     .replace('m', formatNumber(dateInfo.m))
-    .replace('s', formatNumber(dateInfo.s))
-  return res
-}
-
-/**
- * @param {any} date
- * @return {boolean} 
- */
-function isInvalidDate(date: any): boolean {
-  return date instanceof Date && isNaN(date.getTime());
+    .replace('s', formatNumber(dateInfo.s));
 }

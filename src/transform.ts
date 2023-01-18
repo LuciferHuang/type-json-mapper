@@ -1,16 +1,17 @@
-import { TYPE_NAME } from "../libs/types";
-import { formatDate, isNotBasicType } from "./utils";
+import { TYPE_NAME } from './types';
+import { formatDate, isNotBasicType } from './utils';
 
 /**
- * @param {any} oriData - 目标数据
+ * 类型转换
+ * @param oriData - 目标数据
  * @param {TYPE_NAME} typeName - 转换类型
- * @return {any}
-*/
-export function transType<T>(oriData: any, typeName?: TYPE_NAME): any {
+ * @return
+ */
+export function transType<T>(oriData, typeName?: TYPE_NAME) {
   if (isNotBasicType(oriData)) {
     return oriData;
   }
-  let value: any = null;
+  let value = null;
   try {
     switch (typeName) {
       case 'string':

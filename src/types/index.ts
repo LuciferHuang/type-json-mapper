@@ -1,9 +1,7 @@
-import { TYPE_NAME } from "./types";
-
 /**
-* Reflect storage key
-*/
-export const META_KEY = 'TransKey';
+ * 支持转换的类型
+ */
+export type TYPE_NAME = 'string' | 'int' | 'float' | 'boolean' | 'date' | 'time' | 'datetime';
 
 export interface GenericObject {
   [key: string]: any;

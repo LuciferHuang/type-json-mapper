@@ -1,4 +1,4 @@
-import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize } from '../index';
+import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize } from '../src/index';
 
 class Lesson {
   @mapperProperty('ClassName')
@@ -39,7 +39,7 @@ class Address {
   }
 }
 
-const stateMap = { '1': '读书中', '2': '辍学', '3': '毕业' }
+const stateMap = { '1': '读书中', '2': '辍学', '3': '毕业' };
 
 class Student {
   @mapperProperty('StudentID')
@@ -86,7 +86,7 @@ const Students = [
     Address: {
       province: '广东',
       city: '深圳',
-      full_address: 'xxx小学三年二班',
+      full_address: 'xxx小学三年二班'
     },
     Lessons: [
       {
@@ -95,13 +95,13 @@ const Students = [
         DateTime: 1609430399000,
         Date: 1609430399000,
         Time: 1609430399000,
-        Compulsory: 1,
+        Compulsory: 1
       },
       {
         ClassName: '古筝的魅力',
         Teacher: '美丽老师',
-        DateTime: '',
-      },
+        DateTime: ''
+      }
     ],
     State: 1,
     Position: 123,
@@ -116,11 +116,11 @@ const Students = [
     Address: {
       province: '浙江',
       city: '杭州',
-      full_address: 'xxx中学高三二班',
+      full_address: 'xxx中学高三二班'
     },
     Lessons: [],
-    State: 2,
-  },
+    State: 2
+  }
 ];
 
 const [first, second] = deserializeArr(Student, Students);

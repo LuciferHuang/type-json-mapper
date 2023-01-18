@@ -1,27 +1,30 @@
 {
   "name": "type-json-mapper",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter make use of es7 reflect decorator.",
-  "main": "./dist/index.js",
+  "license": "MIT",
+  "author": "LuciferHuang",
+  "main": "dist/index.umd.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
   "scripts": {
-    "release": "git checkout npm-release && tsc && git add -f dist && git commit -m 'publish' && git subtree push --prefix dist origin npm-release && mv -f package.json ./dist && mv -f README.md ./dist",
-    "test": "jest --collectCoverage"
-  },
-  "dependencies": {
-    "reflect-metadata": "^0.1.13"
-  },
-  "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "@types/node": "^14.14.20",
-    "jest": "^26.6.3",
-    "ts-jest": "^26.5.4",
-    "typescript": "^3.9.9"
+    "build": "run-p build:bundle build:esm",
+    "build:bundle": "rimraf dist && rollup --config",
+    "build:esm": "rimraf esm && tsc -p tsconfig.json",
+    "test": "jest --collectCoverage",
+    "prepare": "husky install",
+    "lint": "eslint src",
+    "lint-staged": "lint-staged",
+    "commitlint": "commitlint --config commitlint.config.js -e -V"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hlianfa/type-json-mapper.git"
+    "url": "git+https://github.com/LuciferHuang/type-json-mapper.git"
   },
-  "author": "HLianfa",
+  "bugs": {
+    "url": "https://github.com/LuciferHuang/type-json-mapper/issues"
+  },
+  "homepage": "https://github.com/LuciferHuang/type-json-mapper/blob/master/README.md",
   "keywords": [
     "json-mapper",
     "typescript-json",
@@ -30,9 +33,31 @@
     "api-mapper",
     "api-adapter"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Hlianfa/type-json-mapper/issues"
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
   },
-  "homepage": "https://github.com/Hlianfa/type-json-mapper/blob/master/README.md"
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.20",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.76.0",
+    "rollup-plugin-esbuild": "^4.9.1",
+    "rollup-plugin-polyfill-node": "^0.10.2",
+    "rollup-plugin-sizes": "^1.0.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "eslint": "^8.20.0",
+    "eslint-plugin-html": "^7.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.4",
+    "ts-node": "^10.8.2",
+    "typescript": "^3.9.9"
+  }
 }
