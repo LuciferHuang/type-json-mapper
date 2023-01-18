@@ -10,29 +10,15 @@
  * test: 测试用例修改
  */
 module.exports = {
-  extends: ["@commitlint/config-conventional"],
+  extends: ['@commitlint/config-conventional'],
   rules: {
-    "type-enum": [
-      2,
-      "always",
-      [
-        "feat",
-        "fix",
-        "perf",
-        "refactor",
-        "revert",
-        "style",
-        "docs",
-        "chore",
-        "test",
-      ],
-    ],
-    "type-case": [0],
-    "type-empty": [0],
-    "scope-empty": [0],
-    "scope-case": [0],
-    "subject-full-stop": [0, "never"],
-    "subject-case": [0, "never"],
-    "header-max-length": [0, "always", 72],
-  },
+    'type-enum': [2, 'always', ['feat', 'fix', 'perf', 'refactor', 'revert', 'style', 'docs', 'chore', 'test']],
+    'type-case': [0],
+    'type-empty': [0],
+    'scope-empty': [0],
+    'scope-case': [0],
+    'subject-full-stop': [0, 'never'],
+    'subject-case': [0, 'never'],
+    'header-max-length': [0, 'always', 72]
+  }
 };
