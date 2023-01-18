@@ -5,17 +5,13 @@
 Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter.
 
 ### Doc
-[中文文档](https://melonfield.club/column/detail/cvfCiXD8OBn)
+[中文文档](https://juejin.cn/post/6914085874628034573)
 
 ### Get Started
 
 ```bash
 npm install type-json-mapper --save
 ```
-
-## Language
-
-- Typescript
 
 ## Example
 
@@ -116,13 +112,3 @@ try {
 
 ```
 ![result.png](https://i.loli.net/2021/04/09/kPJW6Nn5gduBZXq.png)
-
-## License
-[MIT](./LICENSE)
-## ChangeLog
-1. add serialize --2021/01/03 [HLianfa](https://github.com/Hlianfa)
-2. add doc --2021/01/04 [HLianfa](https://github.com/Hlianfa)
-3. fix deep serialize & deep deserialize --2021/01/05 [HLianfa](https://github.com/Hlianfa)
-4. eliminate redundancy --2021/01/10 [HLianfa](https://github.com/Hlianfa)
-5. change entry file --2021/01/10 [HLianfa](https://github.com/Hlianfa)
-6. add custom filter --2021/04/09 [HLianfa](https://github.com/Hlianfa)
