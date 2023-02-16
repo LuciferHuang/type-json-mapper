@@ -1,7 +1,9 @@
-import { transType } from './transform';
-import { GenericObject, MetadataObject, MetadataDeepObject, MetadataFilterObject } from './types';
+import { mockByType, transType } from './lib/transform';
+import { GenericObject, MetadataObject, MetadataDeepObject, MetadataFilterObject, MockOptions } from './types';
 import { TYPE_NAME } from './types';
-import { getJsonProperty, hasAnyNullOrUndefined, isArray, isObject, setProperty } from './utils';
+import { getJsonProperty, getRandomInt, hasAnyNullOrUndefined, isArray, isObject, setProperty } from './lib/utils';
+
+const TAG = '[type-json-mapper';
 
 /**
  * 属性装饰器
@@ -49,11 +51,11 @@ export function filterMapperProperty(value: string, filter: Function): (target: 
  */
 export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json: GenericObject) {
   if (hasAnyNullOrUndefined(Clazz, json)) {
-    throw new Error('(type-json-mapper)deserialize：missing Clazz or json');
+    throw new Error(`${TAG}/deserialize]: missing Clazz or json`);
   }
 
   if (!isObject(json)) {
-    throw new Error('(type-json-mapper)deserialize：json is not a object');
+    throw new Error(`${TAG}/deserialize]: json is not a object`);
   }
 
   let result = {};
@@ -110,8 +112,57 @@ export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json:
  */
 export function deserializeArr(Clazz: { new (): GenericObject }, list: GenericObject[]) {
   if (hasAnyNullOrUndefined(Clazz, list)) {
-    throw new Error('(type-json-mapper)deserializeArr：missing Clazz or list');
+    throw new Error(`${TAG}/deserializeArr]: missing Clazz or list`);
   }
 
   return list.map((ele: GenericObject) => deserialize(Clazz, ele));
+}
+
+export function mock<T extends GenericObject>(Clazz: { new (): T }, options?: MockOptions) {
+  let result = {};
+
+  const instance: GenericObject = new Clazz();
+
+  const keys = Object.keys(instance);
+
+  result = instance;
+
+  for (const key of keys) {
+    const { fieldLength = {}, arrayFields = [] } = options;
+
+    let value: any = '';
+    let metaObj: GenericObject = {};
+
+    metaObj = getJsonProperty(instance, key);
+    if (typeof metaObj === 'undefined') {
+      metaObj = {};
+    }
+
+    const { typeName } = metaObj;
+
+    if (typeName) {
+      const length = fieldLength[key] || 6;
+      value = mockByType(typeName, length);
+    }
+
+    const { filter } = metaObj;
+    if (typeof filter === 'function') {
+      const tempVal = filter(value);
+      if (typeof tempVal !== 'undefined') {
+        value = tempVal;
+      }
+    }
+
+    const { Clazz: childClazz } = metaObj;
+    if (typeof childClazz !== 'undefined') {
+      if (arrayFields.includes(key)) {
+        value = new Array(getRandomInt(1, 18)).fill(0).map(() => mock(childClazz, options));
+      } else {
+        value = mock(childClazz, options);
+      }
+    }
+
+    result[key] = value;
+  }
+  return result as T;
 }

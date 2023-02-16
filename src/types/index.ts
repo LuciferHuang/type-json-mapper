@@ -20,3 +20,12 @@ export interface MetadataFilterObject {
   localKey: string;
   filter: Function;
 }
+
+export interface FieldLengthOption {
+  [field: string]: number
+}
+
+export interface MockOptions {
+  fieldLength?: FieldLengthOption
+  arrayFields?: string[]
+}

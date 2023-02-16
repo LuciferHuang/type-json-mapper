@@ -1,9 +1,9 @@
-import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize } from '../src/index';
+import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize, mock } from '../src/index';
 
 class Lesson {
-  @mapperProperty('ClassName')
+  @mapperProperty('ClassName', 'string')
   public name: string;
-  @mapperProperty('Teacher')
+  @mapperProperty('Teacher', 'string')
   public teacher: string;
   @mapperProperty('DateTime', 'datetime')
   public datetime: string;
@@ -25,11 +25,11 @@ class Lesson {
 }
 
 class Address {
-  @mapperProperty('province')
+  @mapperProperty('province', 'string')
   public province: string;
-  @mapperProperty('city')
+  @mapperProperty('city', 'string')
   public city: string;
-  @mapperProperty('full_address')
+  @mapperProperty('full_address', 'string')
   public fullAddress: string;
 
   constructor() {
@@ -42,9 +42,9 @@ class Address {
 const stateMap = { '1': '读书中', '2': '辍学', '3': '毕业' };
 
 class Student {
-  @mapperProperty('StudentID')
+  @mapperProperty('StudentID', 'string')
   public id: string;
-  @mapperProperty('StudentName')
+  @mapperProperty('StudentName', 'string')
   public name: string;
   @mapperProperty('StudentAge', 'int')
   public age: number;
@@ -164,7 +164,7 @@ test('deserialize first parameter illegal input', () => {
     deserialize(null, {});
     flag = 1;
   } catch (err) {
-    expect(err.message).toBe('(type-json-mapper)deserialize：missing Clazz or json');
+    expect(err.message).toBe('[type-json-mapper/deserialize]: missing Clazz or json');
     flag = 2;
   }
   expect(flag).toBe(2);
@@ -176,7 +176,7 @@ test('deserialize second parameter illegal input', () => {
     deserialize(Student, []);
     flag = 1;
   } catch (err) {
-    expect(err.message).toBe('(type-json-mapper)deserialize：json is not a object');
+    expect(err.message).toBe('[type-json-mapper/deserialize]: json is not a object');
     flag = 2;
   }
   expect(flag).toBe(2);
@@ -188,8 +188,14 @@ test('deserializeArr illegal input', () => {
     deserializeArr(null, []);
     flag = 1;
   } catch (err) {
-    expect(err.message).toBe('(type-json-mapper)deserializeArr：missing Clazz or list');
+    expect(err.message).toBe('[type-json-mapper/deserializeArr]: missing Clazz or list');
     flag = 2;
   }
   expect(flag).toBe(2);
+});
+
+test('mock', () => {
+  const res = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
+  expect(res.name.length).toBe(6);
+  expect(Object.prototype.toString.call(res.lessons)).toBe('[object Array]');
 });

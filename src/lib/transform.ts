@@ -1,10 +1,10 @@
-import { TYPE_NAME } from './types';
-import { formatDate, isNotBasicType } from './utils';
+import { TYPE_NAME } from '../types';
+import { formatDate, getRandomFloat, getRandomInt, getRandomString, isNotBasicType } from './utils';
 
 /**
  * 类型转换
- * @param oriData - 目标数据
- * @param {TYPE_NAME} typeName - 转换类型
+ * @param oriData  目标数据
+ * @param {TYPE_NAME} typeName  转换类型
  * @return
  */
 export function transType<T>(oriData, typeName?: TYPE_NAME) {
@@ -49,6 +49,43 @@ export function transType<T>(oriData, typeName?: TYPE_NAME) {
     }
   } catch (error) {
     value = oriData;
+  }
+  return value as T;
+}
+
+/**
+ * 根据类型获取随机数据
+ * @param {TYPE_NAME} typeName 转换类型
+ * @param {number} length  字符长度
+ * @return
+ */
+export function mockByType<T>(typeName: TYPE_NAME, length: number) {
+  let value: any = '';
+  switch (typeName) {
+    case 'string':
+      value = getRandomString(length);
+      break;
+    case 'int':
+      value = getRandomInt(1, length);
+      break;
+    case 'float':
+      value = getRandomFloat(length);
+      break;
+    case 'boolean':
+      value = Math.random() <= 0.5;
+      break;
+    case 'date':
+      value = formatDate(new Date(), 'Y-M-D');
+      break;
+    case 'time':
+      value = formatDate(new Date(), 'h:m:s');
+      break;
+    case 'datetime':
+      value = formatDate(new Date());
+      break;
+    default:
+      value = '';
+      break;
   }
   return value as T;
 }

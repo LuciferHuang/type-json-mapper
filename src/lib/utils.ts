@@ -83,3 +83,49 @@ export function formatDate(timestamp: string | number | Date, format = 'Y-M-D h:
     .replace('m', formatNumber(dateInfo.m))
     .replace('s', formatNumber(dateInfo.s));
 }
+
+/**
+ * 获取随机整数
+ * @param {number} min 最小值
+ * @param {number} max 最大值
+ * @returns {number}
+ */
+export function getRandomInt(min: number, max: number): number {
+  if (!min || !max) {
+    return 0;
+  }
+  const range = max - min;
+  const rand = Math.random();
+  return min + Math.round(rand * range);
+}
+
+/**
+ * 获取随机字符串
+ * @param {number} length 字符串长度
+ * @param {string} chars 字符集
+ * @returns {string}
+ */
+export function getRandomString(length: number, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'): string {
+  if (!length) {
+    return '';
+  }
+  return new Array(length).fill(0).reduce((res) => `${res}${chars.charAt(Math.floor(Math.random() * chars.length))}`, '');
+}
+
+/**
+ * 获取随机小数
+ * @param {number} length 字符长度 
+ * @returns {number}
+ */
+export function getRandomFloat(length: number): number {
+  if (!length) {
+    return 0;
+  }
+  const decimal = getRandomInt(1, length - 2);
+  const numStr = getRandomString(length, '123456789');
+  const floatStr = parseFloat(numStr.split('').reduce((res, char, index) => `${res}${length - index === decimal ? '.' : ''}${char}`, ''));
+  if (floatStr !== floatStr) {
+    return 0;
+  }
+  return floatStr;
+}
