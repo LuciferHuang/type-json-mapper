@@ -4,11 +4,11 @@
 
 Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter. It also supports mock data.
 
-### Doc
+## Doc
 
 [中文文档](https://melonfield.cn/column/detail/cvfCiXD8OBn)
 
-### Get Started
+## Get Started
 
 ```bash
 npm install type-json-mapper --save
@@ -111,6 +111,7 @@ try {
   console.error(err);
 }
 ```
+
 ![result.png](https://i.loli.net/2021/04/09/kPJW6Nn5gduBZXq.png)
 
 Mock data
@@ -120,6 +121,7 @@ import { mock } from 'type-json-mapper';
 const res = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
 console.dir(res);
 ```
+
 ```js
 // console.dir(res);
 {
@@ -133,25 +135,25 @@ console.dir(res);
     {
       name: 'JDtNMx',
       teacher: 'AeI6hB',
-      datetime: '2023-2-17 01:00:07',
-      date: '2023-2-17',
-      time: '01:00:07',
+      datetime: '2023-2-18 15:00:07',
+      date: '2023-2-18',
+      time: '15:00:07',
       compulsory: true
     },
     {
       name: 'BIggA8',
       teacher: '8byaId',
-      datetime: '2023-2-17 01:00:07',
-      date: '2023-2-17',
-      time: '01:00:07',
+      datetime: '2023-2-18 15:00:07',
+      date: '2023-2-18',
+      time: '15:00:07',
       compulsory: false
     },
     {
       name: 'pVda1n',
       teacher: 'BPCmwa',
-      datetime: '2023-2-17 01:00:07',
-      date: '2023-2-17',
-      time: '01:00:07',
+      datetime: '2023-2-18 15:00:07',
+      date: '2023-2-18',
+      time: '15:00:07',
       compulsory: false
     }
   ],
@@ -162,3 +164,9 @@ console.dir(res);
 ```
 
 **Make sure the decorator is assigned a type**
+
+## Test
+
+```bash
+npm run test
+```
