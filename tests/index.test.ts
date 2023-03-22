@@ -51,6 +51,7 @@ class Student {
   public notFloat: number;
   @mapperProperty('NotANum', 'int')
   public notNum: number;
+  // @ts-ignore
   @mapperProperty('UnknownType', 'String')
   public unknownType: string;
   @filterMapperProperty('StudentSex', (val = 0) => {
@@ -68,6 +69,7 @@ class Student {
     const map = { '0': '未知', '1': '读书中', '2': '辍学', '3': '毕业' };
     return map[`${val}`];
   })
+  // @ts-ignore
   public status: string;
   public extra: string;
 
@@ -177,6 +179,7 @@ describe('boundary', () => {
   test('deserialize first parameter illegal input', () => {
     let flag = 0;
     try {
+      // @ts-ignore
       deserialize(null, {});
       flag = 1;
     } catch (err) {
@@ -201,6 +204,7 @@ describe('boundary', () => {
   test('deserializeArr illegal input', () => {
     let flag = 0;
     try {
+      // @ts-ignore
       deserializeArr(null, []);
       flag = 1;
     } catch (err) {
@@ -221,12 +225,15 @@ describe('mock', () => {
 
 describe('tools', () => {
   test('illegal parameters', () => {
+    // @ts-ignore
     const num = getRandomInt();
     expect(num).toBe(0);
-
+    
+    // @ts-ignore
     const string = getRandomString();
     expect(string).toBe('');
-
+    
+    // @ts-ignore
     const float = getRandomFloat();
     expect(float).toBe(0);
   });

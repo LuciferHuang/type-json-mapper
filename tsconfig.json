@@ -17,7 +17,7 @@
     "noImplicitAny": false, // 是否默认禁用 any
     "removeComments": true, // 是否移除注释
     "forceConsistentCasingInFileNames": true, //禁止对同一个文件的不一致的引用。
-    "types": ["node"],
+    "types": ["node", "jest"],
     "target": "ES5", // 编译成什么版本
     "module": "ES6", // 当前代码语法
     "outDir": "esm", // 输出目录
