@@ -124,8 +124,5 @@ export function getRandomFloat(length: number): number {
   const decimal = getRandomInt(1, length - 2);
   const numStr = getRandomString(length, '123456789');
   const floatStr = parseFloat(numStr.split('').reduce((res, char, index) => `${res}${length - index === decimal ? '.' : ''}${char}`, ''));
-  if (floatStr !== floatStr) {
-    return 0;
-  }
   return floatStr;
 }
