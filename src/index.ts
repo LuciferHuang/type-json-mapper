@@ -147,7 +147,7 @@ export function mock<T extends GenericObject>(Clazz: { new (): T }, options?: Mo
 
     const { filter } = metaObj;
     if (typeof filter === 'function') {
-      const tempVal = filter(value);
+      const tempVal = filter();
       if (typeof tempVal !== 'undefined') {
         value = tempVal;
       }

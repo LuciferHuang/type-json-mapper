@@ -1,4 +1,5 @@
 import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize, mock } from '../src/index';
+import { getRandomInt, getRandomString, getRandomFloat } from '../src/lib/utils';
 
 class Lesson {
   @mapperProperty('ClassName', 'string')
@@ -39,8 +40,6 @@ class Address {
   }
 }
 
-const stateMap = { '1': '读书中', '2': '辍学', '3': '毕业' };
-
 class Student {
   @mapperProperty('StudentID', 'string')
   public id: string;
@@ -48,7 +47,16 @@ class Student {
   public name: string;
   @mapperProperty('StudentAge', 'int')
   public age: number;
-  @mapperProperty('StudentSex', 'string')
+  @mapperProperty('NotFloat', 'float')
+  public notFloat: number;
+  @mapperProperty('NotANum', 'int')
+  public notNum: number;
+  @mapperProperty('UnknownType', 'String')
+  public unknownType: string;
+  @filterMapperProperty('StudentSex', (val = 0) => {
+    const map = { 0: '未知', 1: '男生', 2: '女生' };
+    return map[val];
+  })
   public sex: string;
   @mapperProperty('Grade', 'float')
   public grade: number;
@@ -56,22 +64,25 @@ class Student {
   public address?: Address;
   @deepMapperProperty('Lessons', Lesson)
   public lessons?: Lesson[];
-  @filterMapperProperty('State', (val: number) => stateMap[`${val}`])
+  @filterMapperProperty('State', (val = 0) => {
+    const map = { '0': '未知', '1': '读书中', '2': '辍学', '3': '毕业' };
+    return map[`${val}`];
+  })
   public status: string;
-  @filterMapperProperty('Position', (val: number) => stateMap[`${val}`])
-  public position: string;
   public extra: string;
 
   constructor() {
     this.id = '';
     this.name = '';
     this.age = 0;
+    this.notNum = 0;
+    this.notFloat = 0;
     this.sex = '';
+    this.unknownType = '';
     this.grade = 0;
     this.address = undefined;
     this.lessons = undefined;
     this.status = '';
-    this.position = '';
     this.extra = '';
   }
 }
@@ -82,6 +93,9 @@ const Students = [
     StudentName: '李子明',
     StudentAge: '10',
     StudentSex: 1,
+    NotANum: 'lol',
+    NotFloat: 'def',
+    UnknownType: 'funny',
     Grade: '98.6',
     Address: {
       province: '广东',
@@ -104,7 +118,6 @@ const Students = [
       }
     ],
     State: 1,
-    Position: 123,
     extra: '额外信息'
   },
   {
@@ -125,77 +138,96 @@ const Students = [
 
 const [first, second] = deserializeArr(Student, Students);
 
-test('name trans: StudentID 2 id', () => {
-  expect(first.id).toBe('123456');
+describe('transformer', () => {
+  test('name', () => {
+    expect(first.id).toBe('123456');
+  });
+
+  test('type', () => {
+    expect(second.age).toBe(18);
+    expect(first.grade).toBeCloseTo(98.6);
+    expect(second.grade).toBeNull();
+  });
+
+  test('deep', () => {
+    const { address = { city: '' } } = first;
+    expect(address.city).toBe('深圳');
+  });
 });
 
-test('type trans', () => {
-  expect(second.age).toBe(18);
-  expect(first.sex).toBe('1');
-  expect(first.grade).toBe(98.6);
-  expect(second.grade).toBe(null);
+describe('filter', () => {
+  test('inner', () => {
+    const [target] = first.lessons || [];
+    expect(target.datetime).toBe('2020-12-31 23:59:59');
+    expect(target.date).toBe('2020-12-31');
+    expect(target.time).toBe('23:59:59');
+  });
+
+  test('custom', () => {
+    expect(first.sex).toBe('男生');
+    expect(second.status).toBe('辍学');
+  });
 });
 
-test('deep trans: Address 2 address', () => {
-  const { address = { city: '' } } = first;
-  expect(address.city).toBe('深圳');
+describe('boundary', () => {
+  test('do nothing', () => {
+    expect(first.extra).toBe('额外信息');
+  });
+
+  test('deserialize first parameter illegal input', () => {
+    let flag = 0;
+    try {
+      deserialize(null, {});
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/deserialize]: missing Clazz or json');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('deserialize second parameter illegal input', () => {
+    let flag = 0;
+    try {
+      deserialize(Student, []);
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/deserialize]: json is not a object');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('deserializeArr illegal input', () => {
+    let flag = 0;
+    try {
+      deserializeArr(null, []);
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/deserializeArr]: missing Clazz or list');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
 });
 
-test('inner filter', () => {
-  const [target] = first.lessons || [];
-  expect(target.datetime).toBe('2020-12-31 23:59:59');
-  expect(target.date).toBe('2020-12-31');
-  expect(target.time).toBe('23:59:59');
-  expect(second.lessons.length).toBe(0);
+describe('mock', () => {
+  test('generate', () => {
+    const res = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
+    expect(res.name.length).toBe(6);
+    expect(Object.prototype.toString.call(res.lessons)).toBe('[object Array]');
+  });
 });
 
-test('custom filter', () => {
-  expect(first.position).toBe(123);
-  expect(second.status).toBe('辍学');
-});
+describe('tools', () => {
+  test('illegal parameters', () => {
+    const num = getRandomInt();
+    expect(num).toBe(0);
 
-test('do nothing', () => {
-  expect(first.extra).toBe('额外信息');
-});
+    const string = getRandomString();
+    expect(string).toBe('');
 
-test('deserialize first parameter illegal input', () => {
-  let flag = 0;
-  try {
-    deserialize(null, {});
-    flag = 1;
-  } catch (err) {
-    expect(err.message).toBe('[type-json-mapper/deserialize]: missing Clazz or json');
-    flag = 2;
-  }
-  expect(flag).toBe(2);
-});
-
-test('deserialize second parameter illegal input', () => {
-  let flag = 0;
-  try {
-    deserialize(Student, []);
-    flag = 1;
-  } catch (err) {
-    expect(err.message).toBe('[type-json-mapper/deserialize]: json is not a object');
-    flag = 2;
-  }
-  expect(flag).toBe(2);
-});
-
-test('deserializeArr illegal input', () => {
-  let flag = 0;
-  try {
-    deserializeArr(null, []);
-    flag = 1;
-  } catch (err) {
-    expect(err.message).toBe('[type-json-mapper/deserializeArr]: missing Clazz or list');
-    flag = 2;
-  }
-  expect(flag).toBe(2);
-});
-
-test('mock', () => {
-  const res = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
-  expect(res.name.length).toBe(6);
-  expect(Object.prototype.toString.call(res.lessons)).toBe('[object Array]');
+    const float = getRandomFloat();
+    expect(float).toBe(0);
+  });
 });

@@ -1,5 +1,7 @@
 # type-json-mapper
 
+[![codecov](https://codecov.io/gh/LuciferHuang/type-json-mapper/branch/master/graph/badge.svg)](https://codecov.io/gh/LuciferHuang/type-json-mapper)
+
 ## Introduction
 
 Instead of directly using api data, we definitely require an adapter layer to transform data as needed. Furthermore, the adapter inverse the the data dependency from API server(API Server is considered uncontrollable and highly unreliable as data structure may be edit by backend coder for some specific purposes)to our adapter which becomes reliable. Thus, this library is created as the adapter. It also supports mock data.
@@ -56,8 +58,8 @@ class Student {
   public name: string;
   @mapperProperty("StudentAge", "int")
   public age: number;
-  @filterMapperProperty("StudentSex", (val) => {
-    const map = { 1: '男生', 2: '女生'};
+  @filterMapperProperty("StudentSex", (val = 0) => {
+    const map = { 0: '保密' 1: '男生', 2: '女生'};
     return map[val];
   })
   public sex: string;
@@ -128,7 +130,7 @@ console.dir(res);
   id: 'QGBLBA',
   name: 'KTFH6d',
   age: 4,
-  sex: 'IINfTm',
+  sex: '保密',
   grade: 76.15,
   address: { province: 'qvbCte', city: 'DbHfFZ', fullAddress: 'BQ4uIL' },
   lessons: [
