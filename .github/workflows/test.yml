@@ -18,7 +18,8 @@ jobs:
           npm install
           npm run test
 
-      - name: codecov
-        uses: codecov/codecov-action@v1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./clover.xml,./lcov.info
