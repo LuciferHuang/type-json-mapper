@@ -1,5 +1,5 @@
 import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize, mock } from '../src/index';
-import { getRandomInt, getRandomString, getRandomFloat } from '../src/lib/utils';
+import { getRandomInt, getRandomString, getRandomFloat, formatDate } from '../src/lib/utils';
 
 class Lesson {
   @mapperProperty('ClassName', 'string')
@@ -160,9 +160,13 @@ describe('transformer', () => {
 describe('filter', () => {
   test('inner', () => {
     const [target] = first.lessons || [];
-    expect(target.datetime).toBe('2020-12-31 23:59:59');
-    expect(target.date).toBe('2020-12-31');
-    expect(target.time).toBe('23:59:59');
+    const times = 1609430399000;
+    const datetime = formatDate(times);
+    const date = formatDate(times, 'Y-M-D');
+    const time = formatDate(times, 'h:m:s');
+    expect(target.datetime).toBe(datetime);
+    expect(target.date).toBe(date);
+    expect(target.time).toBe(time);
   });
 
   test('custom', () => {
