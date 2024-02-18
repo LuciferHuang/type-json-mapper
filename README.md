@@ -8,7 +8,7 @@ Instead of directly using api data, we definitely require an adapter layer to tr
 
 ## Doc
 
-[中文文档](https://melonfield.cn/column/detail/cvfCiXD8OBn)
+[中文文档](https://mp.weixin.qq.com/s/YVOYZHTDbAfwcGaUUMld0Q)
 
 ## Get Started
 

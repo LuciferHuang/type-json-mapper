@@ -118,7 +118,7 @@ export function deserializeArr(Clazz: { new (): GenericObject }, list: GenericOb
   return list.map((ele: GenericObject) => deserialize(Clazz, ele));
 }
 
-export function mock<T extends GenericObject>(Clazz: { new (): T }, options?: MockOptions) {
+export function mock<T extends GenericObject>(Clazz: { new (): T }, options: MockOptions = {}) {
   let result = {};
 
   const instance: GenericObject = new Clazz();
