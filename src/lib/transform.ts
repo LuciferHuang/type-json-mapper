@@ -4,16 +4,19 @@ import { formatDate, getRandomFloat, getRandomInt, getRandomString, isNotBasicTy
 /**
  * 类型转换
  * @param oriData  目标数据
- * @param {TYPE_NAME} typeName  转换类型
+ * @param type  转换类型
  * @return
  */
-export function transType<T>(oriData, typeName?: TYPE_NAME) {
+export const transType = (oriData: any, type?: TYPE_NAME) => {
+  if (Array.isArray(oriData) && oriData.every((val) => !isNotBasicType(val))) {
+    return transArrayType(oriData, type);
+  }
   if (isNotBasicType(oriData)) {
     return oriData;
   }
   let value = null;
   try {
-    switch (typeName) {
+    switch (type) {
       case 'string':
         value = `${oriData}`;
         break;
@@ -50,18 +53,24 @@ export function transType<T>(oriData, typeName?: TYPE_NAME) {
   } catch (error) {
     value = oriData;
   }
-  return value as T;
+  return value;
 }
 
 /**
- * 根据类型获取随机数据
- * @param {TYPE_NAME} typeName 转换类型
- * @param {number} length  字符长度
- * @return
+ * 转换数组元素类型
+ * @param oriData 
+ * @param type 
  */
-export function mockByType<T>(typeName: TYPE_NAME, length: number) {
+export const transArrayType = (oriData: Array<string | number>, type?: TYPE_NAME) => oriData.map(val => transType(val, type))
+
+/**
+ * 根据类型获取随机数据
+ * @param type 转换类型
+ * @param length  字符长度
+ */
+export const mockByType = (type: TYPE_NAME, length: number) => {
   let value: any = '';
-  switch (typeName) {
+  switch (type) {
     case 'string':
       value = getRandomString(length);
       break;
@@ -87,5 +96,5 @@ export function mockByType<T>(typeName: TYPE_NAME, length: number) {
       value = '';
       break;
   }
-  return value as T;
+  return value;
 }

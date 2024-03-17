@@ -7,49 +7,40 @@ const TAG = '[type-json-mapper';
 
 /**
  * 属性装饰器
- * @param {string} value - 键名
- * @param {TYPE_NAME} typeName - 转换类型
- * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
+ * @param {string} key - 键名
+ * @param {TYPE_NAME} type - 转换类型
  */
-export function mapperProperty(value: string, typeName?: TYPE_NAME): (target: Object, targetKey: string | symbol) => void {
-  const metadata: MetadataObject = {
-    typeName,
-    localKey: value
-  };
-  return setProperty(metadata);
-}
+export const mapperProperty = (key: string, type?: TYPE_NAME) =>
+  setProperty({
+    key,
+    type
+  });
 /**
  * 深层属性装饰器
- * @param {string} value - 键名
+ * @param {string} key - 键名
  * @param Clazz
- * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
  */
-export function deepMapperProperty(value: string, Clazz): (target: Object, targetKey: string | symbol) => void {
-  const metadata: MetadataDeepObject = {
-    localKey: value,
+export const deepMapperProperty = (key: string, Clazz) =>
+  setProperty({
+    key,
     Clazz
-  };
-  return setProperty(metadata);
-}
+  });
 
 /**
  * 自定义属性装饰器
- * @param {string} value - 键名
+ * @param {string} key - 键名
  * @param {Function} filter
- * @return {(target:Object, targetKey:string | symbol)=> void} decorator function
  */
-export function filterMapperProperty(value: string, filter: Function): (target: Object, targetKey: string | symbol) => void {
-  const metadata: MetadataFilterObject = {
-    localKey: value,
+export const filterMapperProperty = (key: string, filter: Function) =>
+  setProperty({
+    key,
     filter
-  };
-  return setProperty(metadata);
-}
+  });
 
 /**
  * 反序列化
  */
-export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json: GenericObject) {
+export const deserialize = <T extends GenericObject>(Clazz: { new (): T }, json: GenericObject) => {
   if (hasAnyNullOrUndefined(Clazz, json)) {
     throw new Error(`${TAG}/deserialize]: missing Clazz or json`);
   }
@@ -58,32 +49,22 @@ export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json:
     throw new Error(`${TAG}/deserialize]: json is not a object`);
   }
 
-  let result = {};
-
   const instance: GenericObject = new Clazz();
+  const result = instance;
 
-  const keys = Object.keys(instance);
+  for (const localKey of Object.keys(instance)) {
+    let value = json[localKey];
+    const metaObj = getJsonProperty(instance, localKey) || {};
 
-  result = instance;
-
-  for (const key of keys) {
-    let value = json[key];
-    let metaObj: GenericObject = {};
-
-    metaObj = getJsonProperty(instance, key);
-    if (typeof metaObj === 'undefined') {
-      metaObj = {};
-    }
-
-    const { typeName, localKey } = metaObj;
-    if (!['', 0, undefined].includes(localKey)) {
-      value = json[localKey];
+    const { type, key } = metaObj as MetadataObject;
+    if (!['', 0, undefined].includes(key)) {
+      value = json[key];
       if (typeof value !== 'undefined') {
-        value = transType(value, typeName);
+        value = transType(value, type);
       }
     }
 
-    const { filter } = metaObj;
+    const { filter } = metaObj as MetadataFilterObject;
     if (typeof filter === 'function') {
       const tempVal = filter(value);
       if (typeof tempVal !== 'undefined') {
@@ -91,7 +72,7 @@ export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json:
       }
     }
 
-    const { Clazz: childClazz } = metaObj;
+    const { Clazz: childClazz } = metaObj as MetadataDeepObject;
     if (typeof childClazz !== 'undefined') {
       if (isObject(value)) {
         value = deserialize(childClazz, value);
@@ -102,47 +83,102 @@ export function deserialize<T extends GenericObject>(Clazz: { new (): T }, json:
       }
     }
 
-    result[key] = value;
+    if (typeof value !== 'undefined') {
+      result[localKey] = value;
+    }
   }
   return result as T;
-}
+};
 
 /**
  * 数组反序列化
  */
-export function deserializeArr(Clazz: { new (): GenericObject }, list: GenericObject[]) {
+export const deserializeArr = <T extends GenericObject>(Clazz: { new (): T }, list: GenericObject[]) => {
   if (hasAnyNullOrUndefined(Clazz, list)) {
     throw new Error(`${TAG}/deserializeArr]: missing Clazz or list`);
   }
 
-  return list.map((ele: GenericObject) => deserialize(Clazz, ele));
+  return list.map((ele: GenericObject) => deserialize<T>(Clazz, ele));
 }
 
-export function mock<T extends GenericObject>(Clazz: { new (): T }, options: MockOptions = {}) {
-  let result = {};
+/**
+ * 序列化
+ */
+export const serialize = (Clazz: { new (): GenericObject }, json: GenericObject) => {
+  if (hasAnyNullOrUndefined(Clazz, json)) {
+    throw new Error(`${TAG}/serialize]: missing Clazz or json`);
+  }
+
+  if (!isObject(json)) {
+    throw new Error(`${TAG}/serialize]: json is not a object`);
+  }
+
+  const result = {};
 
   const instance: GenericObject = new Clazz();
 
-  const keys = Object.keys(instance);
+  for (const localKey of Object.keys(instance)) {
+    let value = json[localKey];
 
-  result = instance;
+    if (typeof value === 'undefined') {
+      continue;
+    }
 
-  for (const key of keys) {
+    const metaObj = getJsonProperty(instance, localKey) || {}
+
+    const { Clazz: childClazz } = metaObj as MetadataDeepObject;
+    if (typeof childClazz !== 'undefined') {
+      if (isObject(value)) {
+        value = serialize(childClazz, value);
+      }
+
+      if (isArray(value)) {
+        value = serializeArr(childClazz, value);
+      }
+    }
+
+    const { key } = metaObj as MetadataObject;
+    result[key ? key : localKey] = value;
+  }
+
+  return result;
+}
+
+/**
+ * 数组序列化
+ */
+export const serializeArr = (Clazz: { new (): GenericObject }, list: GenericObject[]) => {
+  if (hasAnyNullOrUndefined(Clazz, list)) {
+    throw new Error(`${TAG}/serializeArr]: missing Clazz or list`);
+  }
+
+  return list.map((ele: GenericObject) => serialize(Clazz, ele));
+}
+
+export function mock<T extends GenericObject>(Clazz: { new (): T }, options?: MockOptions) {
+  if (hasAnyNullOrUndefined(Clazz)) {
+    throw new Error(`${TAG}/mock]: missing Clazz`);
+  }
+
+  if(!options || typeof options !== 'object') {
+    options = {};
+  }
+
+  const instance: GenericObject = new Clazz();
+
+  const result = instance;
+
+  for (const key of Object.keys(instance)) {
     const { fieldLength = {}, arrayFields = [] } = options;
 
     let value: any = '';
-    let metaObj: GenericObject = {};
+    const metaObj = getJsonProperty(instance, key) || {};
 
-    metaObj = getJsonProperty(instance, key);
-    if (typeof metaObj === 'undefined') {
-      metaObj = {};
-    }
+    const { type } = metaObj;
 
-    const { typeName } = metaObj;
-
-    if (typeName) {
+    if (type) {
       const length = fieldLength[key] || 6;
-      value = mockByType(typeName, length);
+      value = mockByType(type, length);
     }
 
     const { filter } = metaObj;

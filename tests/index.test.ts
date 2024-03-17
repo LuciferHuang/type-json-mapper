@@ -1,17 +1,31 @@
-import { mapperProperty, deepMapperProperty, filterMapperProperty, deserializeArr, deserialize, mock } from '../src/index';
+import {
+  mapperProperty,
+  deepMapperProperty,
+  filterMapperProperty,
+  deserializeArr,
+  deserialize,
+  mock,
+  serializeArr,
+  serialize
+} from '../src/index';
 import { getRandomInt, getRandomString, getRandomFloat, formatDate } from '../src/lib/utils';
 
 class Lesson {
   @mapperProperty('ClassName', 'string')
   public name: string;
+
   @mapperProperty('Teacher', 'string')
   public teacher: string;
+
   @mapperProperty('DateTime', 'datetime')
   public datetime: string;
+
   @mapperProperty('Date', 'date')
   public date: string;
+
   @mapperProperty('Time', 'time')
   public time: string;
+
   @mapperProperty('Compulsory', 'boolean')
   public compulsory: boolean;
 
@@ -43,34 +57,40 @@ class Address {
 class Student {
   @mapperProperty('StudentID', 'string')
   public id: string;
+
   @mapperProperty('StudentName', 'string')
   public name: string;
+
   @mapperProperty('StudentAge', 'int')
   public age: number;
+
   @mapperProperty('NotFloat', 'float')
   public notFloat: number;
+
   @mapperProperty('NotANum', 'int')
   public notNum: number;
   // @ts-ignore
   @mapperProperty('UnknownType', 'String')
   public unknownType: string;
-  @filterMapperProperty('StudentSex', (val = 0) => {
-    const map = { 0: '未知', 1: '男生', 2: '女生' };
-    return map[val];
-  })
-  public sex: string;
+
   @mapperProperty('Grade', 'float')
   public grade: number;
+
+  @mapperProperty('AddressIds', 'string')
+  public addressIds?: string[];
+
   @deepMapperProperty('Address', Address)
   public address?: Address;
+
   @deepMapperProperty('Lessons', Lesson)
   public lessons?: Lesson[];
+
   @filterMapperProperty('State', (val = 0) => {
     const map = { '0': '未知', '1': '读书中', '2': '辍学', '3': '毕业' };
     return map[`${val}`];
   })
-  // @ts-ignore
   public status: string;
+
   public extra: string;
 
   constructor() {
@@ -79,11 +99,11 @@ class Student {
     this.age = 0;
     this.notNum = 0;
     this.notFloat = 0;
-    this.sex = '';
     this.unknownType = '';
     this.grade = 0;
-    this.address = undefined;
-    this.lessons = undefined;
+    this.addressIds = [];
+    this.address = null;
+    this.lessons = [];
     this.status = '';
     this.extra = '';
   }
@@ -94,11 +114,11 @@ const Students = [
     StudentID: '123456',
     StudentName: '李子明',
     StudentAge: '10',
-    StudentSex: 1,
     NotANum: 'lol',
     NotFloat: 'def',
     UnknownType: 'funny',
     Grade: '98.6',
+    AddressIds: [1, 2],
     Address: {
       province: '广东',
       city: '深圳',
@@ -126,7 +146,6 @@ const Students = [
     StudentID: '888888',
     StudentName: '丁仪',
     StudentAge: '18',
-    StudentSex: 2,
     Grade: null,
     Address: {
       province: '浙江',
@@ -140,6 +159,14 @@ const Students = [
 
 const [first, second] = deserializeArr(Student, Students);
 
+delete second.notFloat;
+
+const [oriFirst] = serializeArr(Student, [first, second]);
+
+const mockData1 = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 } });
+
+const mockData2 = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
+
 describe('transformer', () => {
   test('name', () => {
     expect(first.id).toBe('123456');
@@ -151,9 +178,21 @@ describe('transformer', () => {
     expect(second.grade).toBeNull();
   });
 
+  test('sample', () => {
+    const { addressIds = [] } = first;
+    const [target] = addressIds;
+    expect(typeof target).toBe('string');
+  });
+
   test('deep', () => {
     const { address = { city: '' } } = first;
     expect(address.city).toBe('深圳');
+  });
+
+  test('deep arr', () => {
+    const { lessons = [] } = first;
+    const [target] = lessons;
+    expect(target.name).toBe('中国上下五千年');
   });
 });
 
@@ -170,7 +209,6 @@ describe('filter', () => {
   });
 
   test('custom', () => {
-    expect(first.sex).toBe('男生');
     expect(second.status).toBe('辍学');
   });
 });
@@ -183,7 +221,6 @@ describe('boundary', () => {
   test('deserialize first parameter illegal input', () => {
     let flag = 0;
     try {
-      // @ts-ignore
       deserialize(null, {});
       flag = 1;
     } catch (err) {
@@ -208,7 +245,6 @@ describe('boundary', () => {
   test('deserializeArr illegal input', () => {
     let flag = 0;
     try {
-      // @ts-ignore
       deserializeArr(null, []);
       flag = 1;
     } catch (err) {
@@ -217,13 +253,89 @@ describe('boundary', () => {
     }
     expect(flag).toBe(2);
   });
+
+  test('serialize first parameter illegal input', () => {
+    let flag = 0;
+    try {
+      serialize(null, {});
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/serialize]: missing Clazz or json');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('serialize second parameter illegal input', () => {
+    let flag = 0;
+    try {
+      serialize(Student, []);
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/serialize]: json is not a object');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('serializeArr illegal input', () => {
+    let flag = 0;
+    try {
+      serializeArr(null, []);
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/serializeArr]: missing Clazz or list');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('mock first parameter illegal input', () => {
+    let flag = 0;
+    try {
+      mock(null);
+      flag = 1;
+    } catch (err) {
+      expect(err.message).toBe('[type-json-mapper/mock]: missing Clazz');
+      flag = 2;
+    }
+    expect(flag).toBe(2);
+  });
+
+  test('mock second parameter illegal input', () => {
+    let flag = 0;
+    try {
+      mock(Student, null);
+      flag = 1;
+    } catch (err) {
+      flag = 2;
+    }
+    expect(flag).toBe(1);
+  });
+});
+
+describe('serialize', () => {
+  test('deep', () => {
+    const { Lessons = [] } = oriFirst as any;
+    const [target] = Lessons;
+    const { ClassName } = target || {};
+    expect(ClassName).toBe('中国上下五千年');
+  });
+  test('array', () => {
+    const { AddressIds = [] } = oriFirst as any;
+    const [target] = AddressIds;
+    expect(target).toBe('1');
+  });
 });
 
 describe('mock', () => {
   test('generate', () => {
-    const res = mock(Student, { fieldLength: { age: 20, grade: 4, name: 6 }, arrayFields: ['lessons'] });
-    expect(res.name.length).toBe(6);
-    expect(Object.prototype.toString.call(res.lessons)).toBe('[object Array]');
+    expect(mockData1.name.length).toBe(6);
+  });
+
+  test('generate arr', () => {
+    expect(Object.prototype.toString.call(mockData1.lessons)).toBe('[object Object]');
+    expect(Object.prototype.toString.call(mockData2.lessons)).toBe('[object Array]');
   });
 });
 
@@ -232,11 +344,11 @@ describe('tools', () => {
     // @ts-ignore
     const num = getRandomInt();
     expect(num).toBe(0);
-    
+
     // @ts-ignore
     const string = getRandomString();
     expect(string).toBe('');
-    
+
     // @ts-ignore
     const float = getRandomFloat();
     expect(float).toBe(0);

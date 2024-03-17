@@ -8,16 +8,16 @@ export interface GenericObject {
 }
 
 export interface MetadataObject {
-  localKey: string;
-  typeName: TYPE_NAME | undefined;
+  key: string;
+  type: TYPE_NAME | undefined;
 }
 
 export interface MetadataDeepObject {
-  localKey: string;
+  key: string;
   Clazz: any;
 }
 export interface MetadataFilterObject {
-  localKey: string;
+  key: string;
   filter: Function;
 }
 
