@@ -21,7 +21,11 @@ export const getJsonProperty = (target, propertyKey: string) =>
  * @return
  */
 export const setProperty = (value: MetadataObject | MetadataDeepObject | MetadataFilterObject) =>
-  typeof Reflect.metadata === 'function' && Reflect.metadata(META_KEY, value)
+  typeof Reflect.metadata === 'function'
+    ? Reflect.metadata(META_KEY, value)
+    : (target: Object, propertyKey: string | symbol) => {
+        console.warn('Reflect.metadata 未正确加载。');
+      };
 
 /**
  * 判断目标变量是否是对象

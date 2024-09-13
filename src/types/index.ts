@@ -16,9 +16,9 @@ export interface MetadataDeepObject {
   key: string;
   Clazz: any;
 }
-export interface MetadataFilterObject {
+export interface MetadataFilterObject<T = any> {
   key: string;
-  filter: Function;
+  filter: TFilterFunc<T>;
 }
 
 export interface FieldLengthOption {
@@ -29,3 +29,5 @@ export interface MockOptions {
   fieldLength?: FieldLengthOption
   arrayFields?: string[]
 }
+
+export type TFilterFunc<T> = (val: any, row: T) => any;

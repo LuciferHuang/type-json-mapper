@@ -54,6 +54,20 @@ class Address {
   }
 }
 
+interface IStudent {
+  StudentID?: string;
+  StudentName?: string;
+  StudentAge?: string;
+  NotFloat?: string;
+  NotANum?: string;
+  UnknownType?: string;
+  Grade?: string;
+  AddressIds?: string[];
+  Address?: any[];
+  Lessons?: any[];
+  State?: number;
+}
+
 class Student {
   @mapperProperty('StudentID', 'string')
   public id: string;
@@ -69,7 +83,7 @@ class Student {
 
   @mapperProperty('NotANum', 'int')
   public notNum: number;
-  // @ts-ignore
+
   @mapperProperty('UnknownType', 'String')
   public unknownType: string;
 
@@ -80,12 +94,15 @@ class Student {
   public addressIds?: string[];
 
   @deepMapperProperty('Address', Address)
-  public address?: Address;
+  public address?: Address | null;
 
   @deepMapperProperty('Lessons', Lesson)
   public lessons?: Lesson[];
 
-  @filterMapperProperty('State', (val = 0) => {
+  @filterMapperProperty<IStudent>('State', (val = 0, row = {}) => {
+    if (!(row.Lessons || []).length && val === 1) {
+      return '实习中';
+    }
     const map = { '0': '未知', '1': '读书中', '2': '辍学', '3': '毕业' };
     return map[`${val}`];
   })
@@ -153,7 +170,7 @@ const Students = [
       full_address: 'xxx中学高三二班'
     },
     Lessons: [],
-    State: 2
+    State: 1
   }
 ];
 
@@ -186,7 +203,7 @@ describe('transformer', () => {
 
   test('deep', () => {
     const { address = { city: '' } } = first;
-    expect(address.city).toBe('深圳');
+    expect(address?.city).toBe('深圳');
   });
 
   test('deep arr', () => {
@@ -206,10 +223,11 @@ describe('filter', () => {
     expect(target.datetime).toBe(datetime);
     expect(target.date).toBe(date);
     expect(target.time).toBe(time);
+    expect(first.status).toBe('读书中');
   });
 
   test('custom', () => {
-    expect(second.status).toBe('辍学');
+    expect(second.status).toBe('实习中');
   });
 });
 
